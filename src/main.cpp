@@ -36,7 +36,9 @@ int main() {
     // The 4 signifies a websocket message
     // The 2 signifies a websocket event
     string sdata = string(data).substr(0, length);
+#ifdef __DEBUG__
     cout << sdata << endl;
+#endif
     if (sdata.size() > 2 && sdata[0] == '4' && sdata[1] == '2') {
       string s = hasData(sdata);
       if (s != "") {
@@ -130,7 +132,9 @@ int main() {
 
 
           auto msg = "42[\"steer\"," + msgJson.dump() + "]";
+#ifdef __DEBUG__
           cout << msg << std::endl;
+#endif
           // Latency
           // The purpose is to mimic real driving conditions where
           // the car does actuate the commands instantly.

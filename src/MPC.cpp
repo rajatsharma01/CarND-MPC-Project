@@ -37,10 +37,10 @@ size_t a_start = delta_start + N - 1; // There are N - 1 actuations
 const double Lf = 2.67;
 
 // Cost function should try to maintain reference velocity to keep moving
-double ref_v = 100;
+double ref_v = 140;
 
 // We slow down on turns, but still maintain this min velocity
-double min_v = 15;
+double min_v = 25;
 
 class FG_eval {
  public:
@@ -73,7 +73,7 @@ class FG_eval {
 			fg[0] += 5 * CppAD::pow(vars[delta_start + t], 2);
 			fg[0] += 5 * CppAD::pow(vars[a_start + t], 2);
       // Penalize speed while making sharp turns
-      fg[0] += 2000 * CppAD::pow(vars[delta_start + t] * (vars[v_start + t] - min_v), 2);
+      fg[0] += 1000 * CppAD::pow(vars[delta_start + t] * (vars[v_start + t] - min_v), 2);
 		}
 
 		// Smoothen out actuations.
@@ -265,9 +265,11 @@ vector<double> MPC::Solve(Eigen::VectorXd state, Eigen::VectorXd coeffs) {
   // Check some of the solution values
   ok &= solution.status == CppAD::ipopt::solve_result<Dvector>::success;
 
+#ifdef __DEBUG__
   // Cost
   auto cost = solution.obj_value;
   std::cout << "Cost " << cost << std::endl;
+#endif
 
   // TODO: Return the first actuator values. The variables can be accessed with
   // `solution.x[i]`.

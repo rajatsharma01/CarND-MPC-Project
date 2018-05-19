@@ -7,6 +7,9 @@
 #include "Eigen-3.3/Eigen/Core"
 #include "Eigen-3.3/Eigen/QR"
 
+// Uncomment following to enable debug prints
+//#define __DEBUG__
+
 using CppAD::AD;
 
 // For converting back and forth between radians and degrees.
