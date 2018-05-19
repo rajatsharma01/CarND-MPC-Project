@@ -9,6 +9,9 @@ using CppAD::AD;
 size_t N = 20;
 double dt = 0.05;
 
+// Latency to apply actuation
+double latency = 0.1;
+
 // The solver takes all the state variables and actuator
 // variables in a singular vector. Thus, we should to establish
 // when one variable starts and another ends to make our lifes easier.
@@ -141,12 +144,23 @@ vector<double> MPC::Solve(Eigen::VectorXd state, Eigen::VectorXd coeffs) {
   bool ok = true;
   typedef CPPAD_TESTVECTOR(double) Dvector;
 
-  double x = state[0];
-  double y = state[1];
-  double psi = state[2];
-  double v = state[3];
-  double cte = state[4];
-  double epsi = state[5];
+  double x0 = state[0];
+  double y0 = state[1];
+  double psi0 = state[2];
+  double v0 = state[3];
+  double cte0 = state[4];
+  double epsi0 = state[5];
+  double delta0 = state[6];
+  double a0 = state[7];
+
+  // Estimate initial state after actuation latency
+  double x = x0 + v0 * cos(psi0) * latency;
+  double y = y0 + v0 * sin(psi0) * latency;
+  double v = v0 + a0 * latency;
+  double cte = cte0 + v0 * sin(epsi0) * latency;
+  double psi_delta = -v0 * delta0 * latency / Lf;
+  double psi = psi0 + psi_delta;
+  double epsi = epsi0 + psi_delta;
 
   // TODO: Set the number of model variables (includes both states and inputs).
   // For example: If the state is a 4 element vector, the actuators is a 2

@@ -57,6 +57,8 @@ int main() {
           * Both are in between [-1, 1].
           *
           */
+          double steer_value = j[1]["steering_angle"];
+          double throttle_value = j[1]["throttle"];
 
           // Transform the waypoints w.r.t. car's reference points
           Eigen::Map<Eigen::VectorXd> ptsx_e(&ptsx[0], ptsx.size());
@@ -80,13 +82,14 @@ int main() {
           double cte = polyeval(coeffs, 0);
           double epsi = -atan(coeffs[1]);
 
-          // Setup state vector and call MPC solver
-          Eigen::VectorXd state(6);
-          state << 0, 0, 0, v, cte, epsi;
+          // Setup state vector and call MPC solver. MPC also uses steer_value and throttle_value
+          // provided by simulator to estimate initial state after actuation latency of 100 ms.
+          Eigen::VectorXd state(8);
+          state << 0, 0, 0, v, cte, epsi, steer_value, throttle_value;
           auto vars = mpc.Solve(state, coeffs);
 
-          double steer_value = vars[0];
-          double throttle_value = vars[1];
+          steer_value = vars[0];
+          throttle_value = vars[1];
 
           json msgJson;
           // NOTE: Remember to divide by deg2rad(25) before you send the steering value back.
